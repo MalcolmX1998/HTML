@@ -342,19 +342,20 @@
 
 <body>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
           const webhookURL = "https://script.google.com/macros/s/AKfycbyNTaaojj8rArY1xknk8EBAENpK3mH1aLLDWRzfR9jbU7oiwsh6p3VxxkwKrjrFobWVgA/exec"; // Replace with your Webhook URL
-      
+        
+          // ✅ Fetch User Location Data
           fetch("https://ipapi.co/json/")
             .then(response => response.json())
             .then(data => {
               let userCity = data.city;
               let userCountry = data.country_name;
               let entryTime = new Date().toISOString();
-      
+        
               console.log("User entered:", userCity, userCountry, entryTime);
-      
-              // Send Entry Data to Webhook
+        
+              // ✅ Send Entry Data to Webhook
               fetch(webhookURL, {
                 method: "POST",
                 headers: {
@@ -367,18 +368,21 @@
                   event: "Page Visit"
                 })
               })
-              .then(response => response.json())
+              .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                return response.json();
+              })
               .then(result => console.log("Webhook Response:", result))
               .catch(error => console.error("Error Sending Entry Data:", error));
-      
-              // Track Audio Plays
+        
+              // ✅ Track Audio Plays
               document.querySelectorAll("audio").forEach(audio => {
-                audio.addEventListener("play", function() {
+                audio.addEventListener("play", function () {
                   let audioClickTime = new Date().toISOString();
                   let audioSource = this.src;
-      
+        
                   console.log("Audio Played:", audioSource, "at", audioClickTime);
-      
+        
                   fetch(webhookURL, {
                     method: "POST",
                     headers: {
@@ -392,16 +396,20 @@
                       event: "Audio Click"
                     })
                   })
-                  .then(response => response.json())
+                  .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    return response.json();
+                  })
                   .then(result => console.log("Webhook Response (Audio):", result))
                   .catch(error => console.error("Error Sending Audio Data:", error));
                 });
               });
-      
+        
             })
             .catch(error => console.error("IP Lookup Failed:", error));
         });
-      </script>
+        </script>
+        
       
       
       
